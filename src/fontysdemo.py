@@ -61,7 +61,7 @@ def solve_ik(input_limb, input_pose):
 	
 	
 
-def moveto(targetpose, limb):
+def MoveToPose(limb, targetpose):
 	#first calculate IK	
 	angles = solve_ik('left', targetpose)
 	#IK found so now move
@@ -82,9 +82,12 @@ def main():
 	pickpose_up_leftarm = [0.6, 0.85, 0.2, math.pi, 0, math.pi]
 #	startposeleftarm = [0.7, 0.8, 0.2, math.pi, 0, math.pi]
 #	pickposeleftarm = [0.7, 0.8, 0.02, math.pi, 0, math.pi]
-	moveto(startposeleftarm, "left")
-	moveto(pickpose_down_leftarm, "left")
-	moveto(pickpose_up_leftarm, "left")
+	MoveToPose("left", startposeleftarm)
+	MoveToPose("left", pickpose_down_leftarm)
+	MoveToPose("left", pickpose_up_leftarm)
+#	moveto(startposeleftarm, "left")
+#	moveto(pickpose_down_leftarm, "left")
+#	moveto(pickpose_up_leftarm, "left")
 
 #	rospy.spin()
 
