@@ -1,3 +1,4 @@
+echo you have started the fontys pick and place demo
 echo first enable robot
 rosrun baxter_tools enable_robot.py -e
 echo now tuck the arms
