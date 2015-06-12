@@ -61,33 +61,56 @@ def solve_ik(input_limb, input_pose):
 	
 	
 
-def MoveToPose(limb, targetpose):
+def MoveToPose(limb, targetpose): #NOTE ERRORHANDLING MUST STILL BE DONE!!
 	#first calculate IK	
 	angles = solve_ik('left', targetpose)
 	#IK found so now move
 	baxter_interface.Limb(limb).move_to_joint_positions(angles)
 	
+def GripperClose(limb):
+	baxter_interface.Gripper(limb).close()
+	rospy.sleep(1)
 
+def GripperOpen(limb):
+	baxter_interface.Gripper(limb).open()
+	rospy.sleep(1)
+	
+def InitialiseRobot():
+	#Enable the actuators
+	baxter_interface.RobotEnable().enable()
+	
+	#check if gripper is calibrated, if not, reboot it and calibrate
+	print baxter_interface.Gripper('right').calibrated(), " cali"
+	if baxter_interface.Gripper('right').calibrated() == False:
+	    print "cal"
+	    #baxter_interface.Gripper('right').reboot()
+	    baxter_interface.Gripper('right').calibrate()
 
 
 def main():
 	rospy.init_node('fontys_demo', anonymous=True)
+	InitialiseRobot()
 
-	#Enable the actuators
-	baxter_interface.RobotEnable().enable()
-
-
+	#defining all poses
 	startposeleftarm = [0.6, 0.85, 0.2, math.pi, 0, math.pi]
 	pickpose_down_leftarm = [0.6, 0.85, 0.01, math.pi, 0, math.pi]
 	pickpose_up_leftarm = [0.6, 0.85, 0.2, math.pi, 0, math.pi]
-#	startposeleftarm = [0.7, 0.8, 0.2, math.pi, 0, math.pi]
-#	pickposeleftarm = [0.7, 0.8, 0.02, math.pi, 0, math.pi]
+	placepose_down_leftarm = [0.45, 0.60, 0.05, math.pi, 0, math.pi]
+	placepose_up_leftarm = [0.45, 0.60, 0.10, math.pi, 0, math.pi]
+
+
 	MoveToPose("left", startposeleftarm)
 	MoveToPose("left", pickpose_down_leftarm)
+	print("debug, gripperclose now:")
+	GripperOpen("left")
+	rospy.sleep(3) 
+	#somehow I need to call this open function for the close function to have effect
+	GripperClose("left")
 	MoveToPose("left", pickpose_up_leftarm)
-#	moveto(startposeleftarm, "left")
-#	moveto(pickpose_down_leftarm, "left")
-#	moveto(pickpose_up_leftarm, "left")
+	MoveToPose("left", placepose_up_leftarm)
+	MoveToPose("left", placepose_down_leftarm)
+	GripperOpen("left")
+	MoveToPose("left", placepose_up_leftarm)
 
 #	rospy.spin()
 
