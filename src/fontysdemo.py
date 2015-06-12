@@ -77,10 +77,14 @@ def main():
 	baxter_interface.RobotEnable().enable()
 
 
-	startposeleftarm = [0.6, 0.8, 0.1, math.pi, 0, math.pi]
-	pickposeleftarm = [0.6, 0.8, 0.01, math.pi, 0, math.pi]
+	startposeleftarm = [0.6, 0.85, 0.2, math.pi, 0, math.pi]
+	pickpose_down_leftarm = [0.6, 0.85, 0.01, math.pi, 0, math.pi]
+	pickpose_up_leftarm = [0.6, 0.85, 0.2, math.pi, 0, math.pi]
+#	startposeleftarm = [0.7, 0.8, 0.2, math.pi, 0, math.pi]
+#	pickposeleftarm = [0.7, 0.8, 0.02, math.pi, 0, math.pi]
 	moveto(startposeleftarm, "left")
-	moveto(pickposeleftarm, "left")
+	moveto(pickpose_down_leftarm, "left")
+	moveto(pickpose_up_leftarm, "left")
 
 #	rospy.spin()
 
