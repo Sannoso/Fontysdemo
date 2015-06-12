@@ -87,7 +87,7 @@ def main():
 
 	#Enable the actuators
 	baxter_interface.RobotEnable().enable()
-
+	"""
 	#move to joint positions in radians
 	print("and now for the starting position")
 	baxter_interface.Limb('left').move_to_joint_positions({
@@ -119,8 +119,7 @@ def main():
                                                         'left_w1': 1.35, 
                                                         'left_w2': -1.73 })
 
-
-
+	"""
 
 	startposeleftarm = [0.6, 0.8, 0.1, math.pi, 0, math.pi]
 #	startposeietshoger = 
@@ -129,8 +128,6 @@ def main():
 	moveto(pickposeleftarm, "left")
 
 #	rospy.spin()
-
-
 
 if __name__ == '__main__':
     main()
