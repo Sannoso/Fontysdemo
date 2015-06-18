@@ -1,7 +1,8 @@
 Sorting objects demo
 
 download and intialise:
-$git clone <this repo>
+$git clone https://github.com/Sannoso/Fontysdemo.git
+
 $chmod +x fontysdemo.bash
 
 use
