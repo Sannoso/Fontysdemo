@@ -27,7 +27,7 @@ from baxter_core_msgs.srv import (
     SolvePositionIKRequest,
 )
 
-def solve_ik(input_limb, input_pose):
+def solve_ik(input_limb, input_pose):	
 #	print("IK requested for", input_limb)
 	if len(input_pose) != 6:
 		print("6 inputs required!")
@@ -56,9 +56,6 @@ def solve_ik(input_limb, input_pose):
 		return limb_joints
 	else:
 		print("FAILED: No valid joint configuration for this pose found")
-
-
-	
 	
 
 def MoveToPose(limb, targetpose): #NOTE ERRORHANDLING MUST STILL BE DONE!!
@@ -74,18 +71,45 @@ def GripperClose(limb):
 def GripperOpen(limb):
 	baxter_interface.Gripper(limb).open()
 	rospy.sleep(1)
+
+def CheckForObject(limb):
+	camera_sub = rospy.Subscriber("/cameras/right_hand_camera/image",Image,callback)
 	
 def InitialiseRobot():
 	#Enable the actuators
 	baxter_interface.RobotEnable().enable()
 	
 	#check if gripper is calibrated, if not, reboot it and calibrate
-	print baxter_interface.Gripper('right').calibrated(), " cali"
+	print "gripper calibrated: ",baxter_interface.Gripper('right').calibrated()
 	if baxter_interface.Gripper('right').calibrated() == False:
-	    print "cal"
+	    print "calibrating now"
 	    #baxter_interface.Gripper('right').reboot()
 	    baxter_interface.Gripper('right').calibrate()
 
+def callback(data):
+
+    #Republish the camera stream to the screen
+    rospy.Publisher('/robot/xdisplay',Image, queue_size=1).publish(data)
+
+    #Convert incoming image from a ROS image message to a CV image that open CV can process.
+    cv_image = CvBridge().imgmsg_to_cv2(data, "bgr8")
+    #Display the converted cv image, this is the raw camera feed data.
+    cv2.imshow("Raw Camera Feed", cv_image)
+
+    #Create an empty image variable, the same dimensions as our camera feed.
+    gray = numpy.zeros((cv_image.shape), numpy.uint8)
+    #Into this previously created empty image variable, place the grayscale conversion of our camera feed.
+    gray = cv2.cvtColor(cv_image,cv2.COLOR_BGR2GRAY)
+
+    #Create another empty image variable.
+    canny = numpy.zeros((cv_image.shape), numpy.uint8)
+    #Fill the new image variable with a canny edge detection map of the greyscale image created earlier.
+    canny = cv2.Canny(gray, 50, 150, 3)
+    #Display the canny mapping.
+    cv2.imshow("Canny Edge Detection", canny)
+
+    #3ms wait
+    cv2.waitKey(3)
 
 def main():
 	rospy.init_node('fontys_demo', anonymous=True)
@@ -98,6 +122,8 @@ def main():
 	placepose_down_leftarm = [0.45, 0.60, 0.05, math.pi, 0, math.pi]
 	placepose_up_leftarm = [0.45, 0.60, 0.10, math.pi, 0, math.pi]
 
+	#create subscriber to the right hand camera, each frame recieved calls the callback function
+	camera_sub = rospy.Subscriber("/cameras/right_hand_camera/image",Image,callback)
 
 	MoveToPose("left", startposeleftarm)
 	MoveToPose("left", pickpose_down_leftarm)
@@ -111,8 +137,9 @@ def main():
 	MoveToPose("left", placepose_down_leftarm)
 	GripperOpen("left")
 	MoveToPose("left", placepose_up_leftarm)
-
-#	rospy.spin()
+	print("spinning now")
+	
+	rospy.spin()
 
 if __name__ == '__main__':
     main()
